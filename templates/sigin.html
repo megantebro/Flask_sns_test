@@ -1,0 +1,17 @@
+{% extends "template.html" %}
+{% block content %}
+<form action="/-sigin" method="POST">
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">ユーザー名</label>
+        <input  type="text" class="form-control" id="exampleFormControlInput1" placeholder="ユーザー名" name="name">
+    </div>
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">パスワード</label>
+        <input  type="password" class="form-control" id="exampleFormControlInput2" placeholder="パスワード" name="password">
+    </div>
+    <input type="submit" value="サインイン">
+</form>
+<br><h3>すでにアカウントを持っている場合</h3><br>
+<a href="/login">ログイン</a>
+<h2>{{ message }}</h2>
+{% endblock %}

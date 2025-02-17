@@ -1,0 +1,15 @@
+{% extends "template.html" %}
+{% block content %}
+<form action="/-login" method="POST">
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">ユーザー名</label>
+        <input  type="text" class="form-control" id="exampleFormControlInput1" placeholder="ユーザー名" name="name">
+    </div>
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">パスワード</label>
+        <input  type="password" class="form-control" id="exampleFormControlInput2" placeholder="パスワード" name="password">
+    </div>
+    <input type="submit" value="ログイン">
+</form>
+<h2>{{ message }}</h2>
+{% endblock %}
