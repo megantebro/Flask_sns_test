@@ -1,12 +1,14 @@
-from flask import Flask, render_template, request, redirect
+
+from flask import Flask, render_template, request, redirect,current_app
 import os
 
 from werkzeug.security import check_password_hash
 
-from models import User
+from models import User,Post
+from service.post_service import create_post
 from service.user_service import create_user
 from extensions import db,login_manager
-from flask_login import login_user,current_user
+from flask_login import login_user,current_user,logout_user
 
 
 app = Flask(__name__)
@@ -21,7 +23,8 @@ with app.app_context():
 
 @app.route("/")
 def index():
-
+    if current_user:
+        return redirect("home")
     return render_template("sigin.html",title="サインイン")
 
 @app.route("/-sigin", methods=["POST"])
@@ -56,11 +59,32 @@ def login_post():
     else:
         return render_template("login.html", message="ログインに失敗しました",title="ログイン")
 
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect("/login")
+
 @app.route("/home")
 def home():
-    if current_user.username:
-        return render_template("home.html")
+    posts = Post.query.all()
+    if posts:
+        print("postsは存在します")
     else:
-        return render_template("home.html")
+        print("postsは存在しません")
+    if current_user.username:
+        return render_template("home.html",posts=posts)
+    else:
+        return render_template("home.html",posts=posts)
+
+@app.route("/api/post",methods=['POST'])
+def do_post():
+    data = request.get_json()
+
+    if create_post(headline=data.get('header'),body=data.get('body'),username=data.get('username')):
+        current_app.logger.info("正常にpostが作成されました")
+
+    return redirect("/home")
+
+
 if __name__ == "__main__":
     app.run(debug=True)

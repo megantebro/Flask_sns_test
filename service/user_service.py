@@ -1,6 +1,7 @@
 from models import User
 from extensions import db, login_manager
 from flask_login import LoginManager
+from flask import current_app
 
 def create_user(username, password):
     existing_user = User.query.filter_by(username=username).first()
@@ -14,6 +15,7 @@ def create_user(username, password):
         return True, "ユーザーが正常に作成されました"
     except Exception as e:
         db.session.rollback()
+        current_app.logger.error(f"ユーザー作成中にエラーが発生しました{e}")
         return False, f"ユーザー作成中にエラーが発生しました: {str(e)}"
 
 
