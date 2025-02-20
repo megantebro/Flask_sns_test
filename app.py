@@ -9,7 +9,7 @@ from service.post_service import create_post
 from service.user_service import create_user
 from extensions import db,login_manager
 from flask_login import login_user,current_user,logout_user
-
+from flask_moment import Moment
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or 'daljkealifeiaj9294'
@@ -17,6 +17,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database.db')
 db.init_app(app)
 login_manager.init_app(app)
+moment = Moment(app)
 
 with app.app_context():
     db.create_all()
@@ -84,6 +85,13 @@ def do_post():
         current_app.logger.info("正常にpostが作成されました")
 
     return redirect("/home")
+
+@app.route("/api/like_post/<int:post_id>/<int:user_id>")
+def like_post(post_id,user_id):
+    post = Post.query.get_or_404(post_id)
+    user = User.query.get_or_404(user_id)
+    user.like_post(post)
+    return  redirect("/home")
 
 
 if __name__ == "__main__":

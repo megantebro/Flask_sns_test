@@ -28,7 +28,10 @@
     {% for post in posts %}
     <div class="card mb-4">
         <div class="card-body">
-            <h5 class="card-title">{{ post.user.username }}</h5>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="card-title mb-0">{{ post.user.username }}</h5>
+                <small class="text-muted">{{ moment(post.created_at).format('YYYY-MM-DD HH:mm') }}</small>
+            </div>
             <h6 class="card-subtitle mb-2 text-muted">@{{ post.user.username }}</h6>
             <h4>{{ post.headline }}</h4>
             <p class="card-text">{{ post.body }}</p>
@@ -40,7 +43,7 @@
                 <span class="badge bg-secondary">{{ tag.name }}</span>
             {% endfor %}
             </div>
-            <a href="#" class="card-link">Like</a>
+            <a href="{{ url_for('like_post',post_id=post.id,user_id=current_user.id) }}" class="card-link">Like {{ post.like_count() }}</a>
             <a href="#" class="card-link">Comment</a>
             <a href="#" class="card-link">Share</a>
         </div>
