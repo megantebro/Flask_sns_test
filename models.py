@@ -17,26 +17,6 @@ class User (UserMixin,db.Model):
     posts = db.relationship("Post",back_populates='user')
     likes = db.relationship('Like',back_populates="user",cascade="all,delete-orphan")
 
-    def like_post(self,post):
-        if not self.is_liking(post):
-            like = Like(user_id=self.id,post_id=post.id)
-            try:
-                db.session.add(like)
-                db.session.commit()
-            except Exception as e:
-                db.session.rollback()
-                current_app.logger.error("いいね登録中にエラーが発生しました:" + str(e))
-
-    def unlike_post(self,post):
-        like = Like.query.filter_by(user_id=self.id,post_id=post.id).first()
-        try:
-            if like:
-                db.session.delete(like)
-                db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            current_app.logger.error("いいね解除中にエラーが発生しました:" + str(e))
-
     def is_liking(self,post):
         return Like.query.filter_by(user_id=self.id,post_id=post.id).first() is not None
 
@@ -57,6 +37,7 @@ class Post(db.Model):
     file_path = db.Column(db.String(255))
     tags = db.relationship('Tag',secondary=post_tags,back_populates='posts')
     likes = db.relationship('Like',back_populates='post',cascade='all,delete-orphan')
+
 
     def like_count(self):
         return len(self.likes)

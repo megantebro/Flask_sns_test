@@ -20,6 +20,12 @@
         </li>
       </ul>
     </div>
+    <form class="d-flex" action="{{ url_for('home') }}" method="post">
+        <input class="form-control  me-2" type="number" name="year" placeholder="年" value="{{ current_date.year }}" min="2000" max="2099" style="min-width: 85px;" required>
+        <input class="form-control me-2" type="number" name="month" placeholder="月" value="{{ current_date.month }}" min="1" max="12" required>
+        <input class="form-control me-2" type="number" name="day" placeholder="日" value="{{ current_date.day }}" min="1" max="31" required>
+        <button class="btn btn-outline-success" type="submit">Go</button>
+      </form>
   </div>
 </nav>
 
@@ -43,7 +49,8 @@
                 <span class="badge bg-secondary">{{ tag.name }}</span>
             {% endfor %}
             </div>
-            <a href="{{ url_for('like_post',post_id=post.id,user_id=current_user.id) }}" class="card-link">Like {{ post.like_count() }}</a>
+            <button onclick="likePost({{ post.id }}, {{ current_user.id }})" class="btn btn-link">
+                Like <span id="like-count-{{ post.id }}">{{ post.like_count() }}</span></button>
             <a href="#" class="card-link">Comment</a>
             <a href="#" class="card-link">Share</a>
         </div>

@@ -1,16 +1,17 @@
+import datetime
 
-from flask import Flask, render_template, request, redirect,current_app
+from flask import Flask, render_template, request, redirect,current_app,jsonify
 import os
 
 from werkzeug.security import check_password_hash
-
 from models import User,Post
 from service.post_service import create_post
 from service.user_service import create_user
+import service.user_service as user_service
 from extensions import db,login_manager
 from flask_login import login_user,current_user,logout_user
 from flask_moment import Moment
-
+from service import feedpost_service
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or 'daljkealifeiaj9294'
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -24,7 +25,7 @@ with app.app_context():
 
 @app.route("/")
 def index():
-    if current_user:
+    if current_user.is_authenticated:
         return redirect("home")
     return render_template("sigin.html",title="サインイン")
 
@@ -65,17 +66,25 @@ def logout():
     logout_user()
     return redirect("/login")
 
-@app.route("/home")
-def home():
-    posts = Post.query.all()
-    if posts:
-        print("postsは存在します")
+@app.route("/home",methods=["GET","POST"])
+@app.route("/home/$<int:year>/$<int:month>/$<int:day>")
+def home(year=None,month=None,day=None):
+    if request.method == 'POST':
+        year = int(request.form['year'])
+        month = int(request.form['month'])
+        day = int(request.form['day'])
+        return redirect(f"/home/${year}/${month}/${day}")
+
+    if year is None or month is None or day is None:
+        current_date = datetime.date.today()
     else:
-        print("postsは存在しません")
-    if current_user.username:
-        return render_template("home.html",posts=posts)
-    else:
-        return render_template("home.html",posts=posts)
+        current_date = datetime.date(year, month, day)
+        # ここで current_date を使用して必要な処理を行う
+    user_timeline = feedpost_service.UserTimeLine(user=current_user)
+    return render_template('home.html',posts=user_timeline.get_timeline_someday(current_date),
+                           current_date=current_date)
+
+
 
 @app.route("/api/post",methods=['POST'])
 def do_post():
@@ -86,13 +95,18 @@ def do_post():
 
     return redirect("/home")
 
-@app.route("/api/like_post/<int:post_id>/<int:user_id>")
+@app.route("/api/like_post/<int:post_id>/<int:user_id>",methods=["POST"])
 def like_post(post_id,user_id):
-    post = Post.query.get_or_404(post_id)
-    user = User.query.get_or_404(user_id)
-    user.like_post(post)
-    return  redirect("/home")
+    post = Post.query.get(post_id)
+    user = User.query.get(user_id)
+    if post and user:
+        if not user.is_liking(post):
+           user_service.like_post(user,post)
+        else:
+           user_service.unlike_post(user,post)
+        return jsonify({'success': True, 'new_like_count': post.like_count()})
+    return jsonify({'success': False}), 400
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,host="0.0.0.0",port=5001)

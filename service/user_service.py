@@ -1,4 +1,4 @@
-from models import User
+from models import User,Post,Like
 from extensions import db, login_manager
 from flask_login import LoginManager
 from flask import current_app
@@ -18,6 +18,25 @@ def create_user(username, password):
         current_app.logger.error(f"ユーザー作成中にエラーが発生しました{e}")
         return False, f"ユーザー作成中にエラーが発生しました: {str(e)}"
 
+def like_post(user:User,post:Post):
+    if not user.is_liking(post=post):
+        like = Like(user_id=user.id,post_id=post.id)
+        try:
+            db.session.add(like)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error("いいね登録中にエラーが発生しました" + str(e))
+
+def unlike_post(user:User,post:Post):
+    like = Like.query.filter_by(user_id=user.id,post_id=post.id).first()
+    try:
+        if like:
+            db.session.delete(like)
+            db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error("いいね解除中にエラーが発生しました" + str(e))
 
 
 @login_manager.user_loader

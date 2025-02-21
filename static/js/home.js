@@ -22,4 +22,23 @@ function post(event) {
     })
     document.getElementById('postForm').reset();
   }
+
+  function likePost(postId, userId) {
+    fetch(`api/like_post/${postId}/${userId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`like-count-${postId}`).textContent = data.new_like_count;
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
   
