@@ -45,16 +45,20 @@ class Post(db.Model):
     def is_liked_by(self,user):
         return Like.query.filter_by(user_id=user.id,post_id=self.id).first() is not None
 
-    def __init__(self,headline,body,user,file_path=None):
+    def __init__(self,headline,body,user,file_path=None,tags=None):
         self.headline = headline
         self.body = body
         self.user = user
         self.file_path = file_path
+        self.tags = tags
 
 class Tag(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(50),unique=True,nullable=False)
     posts = db.relationship('Post',secondary='post_tags',back_populates='tags')
+
+    def __init__(self,name:str):
+        self.name = name
 
 class Like(db.Model):
     id = db.Column(db.Integer,primary_key=True)

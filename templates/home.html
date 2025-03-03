@@ -20,15 +20,15 @@
         </li>
       </ul>
     </div>
-    <form class="d-flex" action="{{ url_for('home') }}" method="post">
-        <input class="form-control  me-2" type="number" name="year" placeholder="年" value="{{ current_date.year }}" min="2000" max="2099" style="min-width: 85px;" required>
-        <input class="form-control me-2" type="number" name="month" placeholder="月" value="{{ current_date.month }}" min="1" max="12" required>
-        <input class="form-control me-2" type="number" name="day" placeholder="日" value="{{ current_date.day }}" min="1" max="31" required>
+    <form class="d-flex" action="{{ url_for('home') }}" onsubmit="go_someday(event)" >
+        <input class="form-control  me-2" id="year" type="number" name="year" placeholder="年" value="{{ current_date.year }}" min="2000" max="2099" style="min-width: 85px;" required>
+        <input class="form-control me-2" id="month" type="number" name="month" placeholder="月" value="{{ current_date.month }}" min="1" max="12" required>
+        <input class="form-control me-2" id="day" type="number" name="day" placeholder="日" value="{{ current_date.day }}" min="1" max="31" required>
         <button class="btn btn-outline-success" type="submit">Go</button>
       </form>
   </div>
 </nav>
-
+ 
 <div class="container mt-4">
 
     {% for post in posts %}
@@ -53,6 +53,9 @@
                 Like <span id="like-count-{{ post.id }}">{{ post.like_count() }}</span></button>
             <a href="#" class="card-link">Comment</a>
             <a href="#" class="card-link">Share</a>
+            {% if post.user == current_user %}
+            <button onclick="post_delete({{ post.id }})" class="btn btn-link">delete</button>
+            {% endif %}
         </div>
     </div>
     {% endfor %}
@@ -84,9 +87,9 @@
             <div class="card-body">
                 <h5 class="card-title">Trending Topics</h5>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item">#Python</li>
-                    <li class="list-group-item">#Flask</li>
-                    <li class="list-group-item">#WebDevelopment</li>
+                    {% for tag in tags %}
+                    <a href="/home/{{ current_date.strftime('%Y/%m/%d') + '/' + tag.name }}">{{ tag.name }}</a>
+                    {% endfor %}
                 </ul>
             </div>
         </div>
@@ -112,7 +115,7 @@
     }
     
     body {
-        padding-bottom: 200px; /* 投稿フォームの高さに応じて調整 */
+        padding-bottom: 600px; /* 投稿フォームの高さに応じて調整 */
     }
   </style>
   
