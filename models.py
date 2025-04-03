@@ -69,5 +69,9 @@ class Like(db.Model):
     user = db.relationship("User",back_populates='likes')
     post = db.relationship("Post",back_populates='likes')
 
+class File(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    file_name = db.Column(db.String(30))
+
 
 

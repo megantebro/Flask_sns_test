@@ -3,11 +3,14 @@ from extensions import db
 from flask import current_app
 import re
 
-def create_post(headline:str,body:str,username:str,file=None):
+def create_post(headline:str,body:str,username:str,filename:str=None):
     try:
         user = User.query.filter_by(username=username).first()
         tags = search_tags(body)
-        new_post = Post(user=user,body=body,headline=headline,tags=tags)
+        if not filename:
+            new_post = Post(user=user,body=body,headline=headline,tags=tags)
+        else:
+            new_post = Post(user=user,body=body,headline=headline,tags=tags,file_path=f"/static/uploads/{filename}")
         print(new_post.tags)
         db.session.add(new_post)
         db.session.commit()

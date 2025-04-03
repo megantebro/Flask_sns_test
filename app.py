@@ -13,7 +13,8 @@ from extensions import db,login_manager
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_moment import Moment
 from service import feedpost_service,post_service
-
+from flask_cors import CORS
+from service.file_service import save_file
 
 
 app = Flask(__name__)
@@ -23,6 +24,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'da
 db.init_app(app)
 login_manager.init_app(app)
 moment = Moment(app)
+CORS(app)
 with app.app_context():
     db.create_all()
 
@@ -92,10 +94,19 @@ def home(year=None,month=None,day=None,tag_name=None):
 @app.route("/api/post",methods=['POST'])
 @login_required
 def do_post():
-    data = request.get_json()
+    head = request.form.get("header")
+    username = request.form.get("username")
+    body = request.form.get("body")
 
-    if create_post(headline=data.get('header'),body=data.get('body'),username=data.get('username')):
-        current_app.logger.info("正常にpostが作成されました")
+    if "file" in request.files:
+        file = request.files["file"]
+        filename = save_file(file,file.filename)
+        if create_post(headline=head,body=body,username=username,filename=filename):
+            current_app.logger.info("正常にpostが作成されました")
+
+    else:
+        if create_post(headline=head,body=body,username=username):
+            current_app.logger.info("正常にpostが作成されました")
 
     return redirect("/home")
 
