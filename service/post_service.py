@@ -3,15 +3,15 @@ from extensions import db
 from flask import current_app
 import re
 
-def create_post(headline:str,body:str,username:str,filename:str=None):
+def create_post(headline:str,body:str,username:str,filename:str=None,reply_to_id:int = None):
     try:
+        if reply_to_id: reply_to_id = int(reply_to_id)
         user = User.query.filter_by(username=username).first()
         tags = search_tags(body)
         if not filename:
-            new_post = Post(user=user,body=body,headline=headline,tags=tags)
+            new_post = Post(user=user,body=body,headline=headline,tags=tags,reply_to_id=reply_to_id)
         else:
-            new_post = Post(user=user,body=body,headline=headline,tags=tags,file_path=f"/static/uploads/{filename}")
-        print(new_post.tags)
+            new_post = Post(user=user,body=body,headline=headline,tags=tags,file_path=f"/static/uploads/{filename}",reply_to_id=reply_to_id)
         db.session.add(new_post)
         db.session.commit()
         return True,"正常にポストされました"

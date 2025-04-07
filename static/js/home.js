@@ -1,6 +1,6 @@
 async function post(event) {
     event.preventDefault(); // フォームのデフォルトの送信を防ぐ
-  
+    const replyTo = event.currentTarget.dataset.replyto;
     const body = document.getElementById('postContent').value;
     const username = document.getElementById('username').value;
     const header = document.getElementById('headerContent').value;
@@ -11,7 +11,7 @@ async function post(event) {
       alert('投稿内容を入力してください。');
       return;
     }
-    
+    console.log("replyto," ,replyTo)
     console.log('header:', header);
     console.log('body:', body);
     console.log('Username:', username);
@@ -24,7 +24,9 @@ async function post(event) {
     if (file) {
         formData.append('file', file);
     }
-
+    if (replyTo){
+        formData.append("replyto",replyTo)
+    }
     try {
         const response = await fetch('/api/post', {
             method: 'POST',
@@ -43,12 +45,14 @@ async function post(event) {
     } catch (error) {
         console.error('ネットワークエラー:', error);
     }
+    location.reload()
 }
 
 
 
 function post_delete(postId){
     event.preventDefault()
+
     fetch(`/api/post_delete/${postId}`, {
         method: 'POST',
         headers: {
@@ -57,6 +61,7 @@ function post_delete(postId){
         },
         credentials: 'same-origin'
     })
+    location.reload()
 }
 
   function likePost(postId, userId) {
@@ -75,15 +80,37 @@ function post_delete(postId){
         }
     })
     .catch(error => console.error('Error:', error));
+    location.reload()
 }
 
 
 function go_someday(event){
-   
+
     event.preventDefault()   
+    
+    const tagName = event.target.dataset.tag;
     const year = document.getElementById('year').value;
     const month = document.getElementById('month').value;
     const day = document.getElementById('day').value;
-    window.location = `/home/${year}/${month}/${day}`
+    
+    if(tagName != null){
+        window.location = `/home/${year}/${month}/${day}/${tagName}`
+    }
+    else{
+        window.location = `/home/${year}/${month}/${day}`
+    }
+}
+
+function copyPostLink(postId) {
+    const link = `${window.location.origin}/post/${postId}`;
+
+    navigator.clipboard.writeText(link)
+        .then(() => {
+            alert("リンクをコピーしました！");
+        })
+        .catch(err => {
+            console.error('コピーに失敗しました:', err);
+            alert("コピーに失敗しました。手動でコピーしてください。");
+        });
 }
 

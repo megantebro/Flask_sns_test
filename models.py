@@ -9,7 +9,6 @@ from flask import current_app
 post_tags = Table('post_tags',db.Model.metadata,
                   Column("post_id",Integer,ForeignKey('post.id')),
                         Column('tag_id',Integer,ForeignKey('tag.id')))
-
 class User (UserMixin,db.Model):
     id = db.Column(db.Integer,primary_key=True)
     username = db.Column(db.String(20),unique=True,nullable=False)
@@ -37,6 +36,8 @@ class Post(db.Model):
     file_path = db.Column(db.String(255))
     tags = db.relationship('Tag',secondary=post_tags,back_populates='posts')
     likes = db.relationship('Like',back_populates='post',cascade='all,delete-orphan')
+    reply_to_id = db.Column(db.Integer,db.ForeignKey('post.id',name='fk_reply_to_post'),nullable=True)
+    reply_to = db.relationship("Post",remote_side=[id],backref='replies')
 
 
     def like_count(self):
@@ -45,12 +46,13 @@ class Post(db.Model):
     def is_liked_by(self,user):
         return Like.query.filter_by(user_id=user.id,post_id=self.id).first() is not None
 
-    def __init__(self,headline,body,user,file_path=None,tags=None):
+    def __init__(self,headline,body,user,file_path=None,tags=None,reply_to_id:int=None):
         self.headline = headline
         self.body = body
         self.user = user
         self.file_path = file_path
         self.tags = tags
+        self.reply_to_id = reply_to_id
 
 class Tag(db.Model):
     id = db.Column(db.Integer,primary_key=True)
