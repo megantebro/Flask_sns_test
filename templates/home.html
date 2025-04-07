@@ -64,7 +64,8 @@
         </div>
         {% if post.file_path %}
         <div class="mt-auto">
-            <img src="{{ post.file_path }}" class="img-fluid w-100" alt="Attached image" style="object-fit: cover;">
+            <img src="{{ post.file_path }}"
+            style="max-height: 600px; height: auto; width: auto; float: left; margin-left: 1rem;" />
         </div>
         {% endif %}
     </div>
@@ -81,7 +82,7 @@
                         <div class="mb-3">
                             <textarea id="headerContent" class="form-control" rows="1" placeholder="ここに見出しを入力"></textarea>
                             <textarea id="postContent" class="form-control mt-2" rows="5" placeholder="内容を入力"></textarea>
-                            <input type="file" name="image" accept="igame/*">
+                            <input type="file" name="image" accept="image/*">
                         </div>
                         <input type="hidden" id="username" value="{{ current_user.username }}">
 

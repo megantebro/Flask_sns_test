@@ -13,4 +13,5 @@ dependencies = [
     "flask-moment>=1.0.6",
     "flask-cors>=5.0.1",
     "mysql>=0.0.3",
+    "pillow>=11.1.0",
 ]
