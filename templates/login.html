@@ -12,6 +12,10 @@
     <input type="submit" value="ログイン">
 </form>
 <br><br>
-<a href="/sigin">アカウントがない場合はこちらで登録</a>
+<a href="/" class="btn btn-secondary mt-3">アカウントがない場合はこちらで登録</a>
 <h2>{{ message }}</h2>
+
+<form action="/guest_login" method="POST" >
+    <input type="submit" value="ゲストとしてログイン" class="btn btn-secondary mt-3">
+</form>
 {% endblock %}

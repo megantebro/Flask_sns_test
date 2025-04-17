@@ -148,5 +148,14 @@ def like_post(post_id,user_id):
     return jsonify({'success': False}), 400
 
 
+@app.route("/guest_login", methods=["POST"])
+def guest_login():
+    guest = User.query.filter_by(username="guest").first()
+    if guest:
+        login_user(guest)
+        return redirect("/home")
+    else:
+        return render_template("sigin.html", message="ゲストログインに失敗しました", title="サインイン")
+
 if __name__ == "__main__":
     app.run(debug=True,host="0.0.0.0",port=5001)
